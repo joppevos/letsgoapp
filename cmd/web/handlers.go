@@ -3,15 +3,13 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/joppevos/letsgoapp/pkg/models"
 	"net/http"
 	"strconv"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		app.notFound(w)
-	}
 
 	s, err := app.snippets.Latest()
 	if err != nil {
@@ -21,9 +19,11 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, "home.page.tmpl", &templateData{Snippets: s})
 }
 
+func (app application) showSnippetForm(w http.ResponseWriter, r *http.Request)  {
+}
+
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
-	// Notfound on error or negative number
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil || id < 1 {
 		app.notFound(w)
 		return
@@ -44,11 +44,6 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.Header().Set("Allow", http.MethodPost)
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
 
 	title := "my title"
 	content := "my content"
@@ -58,5 +53,5 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		app.serveError(w, err)
 	}
-	http.Redirect(w, r, fmt.Sprintf("/snippet?id=%d", id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 }
