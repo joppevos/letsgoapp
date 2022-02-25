@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"net/http"
-	"github.com/gorilla/mux"
 )
 
 func (app *application) routes() http.Handler {
@@ -12,7 +12,7 @@ func (app *application) routes() http.Handler {
 	r := mux.NewRouter()
 	r.HandleFunc("/", app.home)
 	r.HandleFunc("/snippet", app.showSnippet).Methods(http.MethodGet)
-	r.HandleFunc("/snippet/create", app.showSnippetForm).Methods(http.MethodGet)
+	r.HandleFunc("/snippet/create", app.createSnippetForm).Methods(http.MethodGet)
 	r.HandleFunc("/snippet/create", app.createSnippet).Methods(http.MethodPost)
 	r.HandleFunc("/snippet/{id}", app.showSnippet).Methods(http.MethodGet)
 
