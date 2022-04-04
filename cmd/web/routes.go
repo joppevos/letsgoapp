@@ -9,12 +9,14 @@ import (
 func (app *application) routes() http.Handler {
 
 	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
+	dynamicMiddleware := alice.New(app.session.Enable)
+
 	r := mux.NewRouter()
-	r.HandleFunc("/", app.home)
-	r.HandleFunc("/snippet", app.showSnippet).Methods(http.MethodGet)
-	r.HandleFunc("/snippet/create", app.createSnippetForm).Methods(http.MethodGet)
-	r.HandleFunc("/snippet/create", app.createSnippet).Methods(http.MethodPost)
-	r.HandleFunc("/snippet/{id}", app.showSnippet).Methods(http.MethodGet)
+	r.Handle("/", dynamicMiddleware.ThenFunc(app.home))
+	r.Handle("/snippet", dynamicMiddleware.ThenFunc(app.showSnippet)).Methods(http.MethodGet)
+	r.Handle("/snippet/create", dynamicMiddleware.ThenFunc(app.createSnippetForm)).Methods(http.MethodGet)
+	r.Handle("/snippet/create", dynamicMiddleware.ThenFunc(app.createSnippet)).Methods(http.MethodPost)
+	r.Handle("/snippet/{id}", dynamicMiddleware.ThenFunc(app.showSnippet)).Methods(http.MethodGet)
 
 	fileServer := http.FileServer(http.Dir("./ui/static"))
 	r.Handle("/static/", http.StripPrefix("/static", fileServer))

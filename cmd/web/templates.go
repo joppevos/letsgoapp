@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/joppevos/letsgoapp/pkg/forms"
 	"github.com/joppevos/letsgoapp/pkg/models"
 	"html/template"
-	"net/url"
 	"path/filepath"
 	"time"
 )
@@ -12,8 +12,7 @@ type templateData struct {
 	CurrentYear int
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
-	FormErrors  map[string]string
-	FormData 	url.Values
+	Form 		*forms.Form
 }
 
 func humanDate(t time.Time) string {
